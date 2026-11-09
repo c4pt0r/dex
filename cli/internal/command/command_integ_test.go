@@ -459,7 +459,7 @@ func TestFlowClientOperationsMapSDKEquivalentRequests(t *testing.T) {
 	if service.waitStepRequest.GetStepExecutionNumber() != "2" || service.waitStepRequest.GetRequestTimeoutSeconds() != 2 || service.waitStepRequest.GetRequestId() == "" {
 		t.Fatalf("unexpected wait-step request: %#v", service.waitStepRequest)
 	}
-	if service.updateConfigRequest.GetFlowConfig().GetContinueAsNewPageSizeInBytes() != 1024 || service.updateConfigRequest.GetFlowConfig().AttributeStoreNames == nil || len(service.updateConfigRequest.GetFlowConfig().GetAttributeStoreNames().GetNames()) != 0 || service.updateConfigRequest.GetFlowConfig().GetHistoryWindowEvents() != 5000 || service.updateConfigRequest.GetFlowConfig().DeleteExpiredHistoryObjects == nil || service.updateConfigRequest.GetFlowConfig().GetDeleteExpiredHistoryObjects() {
+	if service.updateConfigRequest.GetFlowConfig().GetContinueAsNewPageSizeInBytes() != 1024 || service.updateConfigRequest.GetFlowConfig().AttributeStoreNames == nil || len(service.updateConfigRequest.GetFlowConfig().GetAttributeStoreNames().GetNames()) != 0 || service.updateConfigRequest.GetFlowConfig().GetHistoryWindowEvents() != 5000 || service.updateConfigRequest.GetFlowConfig().DeleteExpiredHistoryObjects != nil {
 		t.Fatalf("unexpected update-config request: %#v", service.updateConfigRequest)
 	}
 	if service.continueAsNewRequest.GetFlowId() != "flow-1" {

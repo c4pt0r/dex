@@ -380,11 +380,7 @@ test("SubFlows always send the exact pull Worker target with and without config 
         ? configOverride.continueAsNewThreshold
         : undefined,
     );
-    assert.equal(
-      mappedConfig?.deleteExpiredHistoryObjects,
-      configOverride !== undefined && "deleteExpiredHistoryObjects" in configOverride
-        ? configOverride.deleteExpiredHistoryObjects : undefined,
-    );
+    assert.equal(mappedConfig?.deleteExpiredHistoryObjects, undefined);
     assert.equal(
       mappedConfig?.historyWindowEvents,
       configOverride !== undefined && "historyWindowEvents" in configOverride

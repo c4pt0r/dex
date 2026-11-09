@@ -479,11 +479,11 @@ test("Client maps typed calls and hydrates blob-backed outputs", async () => {
     assert.equal(requests.updateFlowConfig.flowConfig.deleteExpiredHistoryObjects, undefined);
     for (const shouldDelete of [true, false]) {
       await client.updateFlowConfig("flow-1", { deleteExpiredHistoryObjects: shouldDelete });
-      assert.equal(requests.updateFlowConfig.flowConfig.deleteExpiredHistoryObjects, shouldDelete);
+      assert.equal(requests.updateFlowConfig.flowConfig.deleteExpiredHistoryObjects, undefined);
     }
     await client.updateFlowConfig("flow-1", { historyWindowEvents: 2500 });
     assert.equal(requests.updateFlowConfig.flowConfig.historyWindowEvents, 2500);
-    assert.equal(requests.start?.flowStartOptions?.flowConfigOverride?.deleteExpiredHistoryObjects, false);
+    assert.equal(requests.start?.flowStartOptions?.flowConfigOverride?.deleteExpiredHistoryObjects, undefined);
     assert.equal(requests.start?.flowType, "TestFlow");
     assert.equal(requests.start?.startStepType, "Start");
     assert.equal(requests.start?.stepOptions?.heartbeatTimeoutSeconds, 2);

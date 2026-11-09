@@ -39,7 +39,6 @@ public final class FlowConfig {
     private final StepDurability stepDurability;
     private final List<String> attributeStoreNames;
     private final Integer historyWindowEvents;
-    private final Boolean deleteExpiredHistoryObjects;
 
     private FlowConfig(final Builder builder) {
         this.activeStepSearchMode = builder.activeStepSearchMode;
@@ -48,7 +47,6 @@ public final class FlowConfig {
         this.stepDurability = builder.stepDurability;
         this.attributeStoreNames = builder.attributeStoreNames;
         this.historyWindowEvents = builder.historyWindowEvents;
-        this.deleteExpiredHistoryObjects = builder.deleteExpiredHistoryObjects;
     }
 
     /**
@@ -80,10 +78,6 @@ public final class FlowConfig {
         return attributeStoreNames;
     }
 
-    Boolean getDeleteExpiredHistoryObjects() {
-        return deleteExpiredHistoryObjects;
-    }
-
     Integer getHistoryWindowEvents() {
         return historyWindowEvents;
     }
@@ -96,7 +90,6 @@ public final class FlowConfig {
         private StepDurability stepDurability;
         private List<String> attributeStoreNames;
         private Integer historyWindowEvents;
-        private Boolean deleteExpiredHistoryObjects;
 
         private Builder() {
         }
@@ -236,37 +229,20 @@ public final class FlowConfig {
         }
 
         /**
-         * Controls deletion of object storage objects for expired history segments.
+         * Has no effect. The SDK does not send this value to the server.
          *
-         * <p>{@code true} deletes each expired segment's object about one hour after expiry.
-         * {@code false} keeps objects until the run is deleted after retention.
-         * This only matters when history offload is enabled. Omission uses
-         * {@code history.deleteExpiredObjects} on the server: true for dev/local and false for serve.
-         * The run records that default at start.
-         * The server-side switch is experimental.
-         * Servers older than server-zd 0.1.22 ignore the value.
+         * <p>server-zd 0.1.23 and later always delete the objects of expired history segments,
+         * about one hour after the history window passes them. They accept and ignore this field.
+         * The method remains so existing code still compiles.
          *
-         * <p>Set it through {@link StartFlowOptions.Builder#configOverride(FlowConfig)},
-         * update it with {@link Client#updateFlowConfig(String, FlowConfig)}, or override it with
-         * {@link SubFlowOptions.Builder#configOverride(FlowConfig)}.
-         * Children otherwise inherit the parent's value.
-         * An omitted update preserves the current value; it cannot be cleared to the server
-         * default. Enabling deletion includes already expired objects. Disabling it stops
-         * deletions that have not started; requests already sent may complete, and deleted
-         * objects never return. History reads and Time Travel exclude expired history even
-         * when its objects are kept.
-         *
-         * <pre>{@code
-         * client.updateFlowConfig("order-42", FlowConfig.newBuilder()
-         *         .deleteExpiredHistoryObjects(false).build());
-         * }</pre>
-         *
-         * @param value whether to delete expired history objects
+         * @param value ignored
          * @return this builder
          * @since 1.39.0
+         * @deprecated Deprecated in 1.40.0. Has no effect because the server always deletes
+         *     expired history objects. Remove the call.
          */
+        @Deprecated
         public Builder deleteExpiredHistoryObjects(final boolean value) {
-            deleteExpiredHistoryObjects = value;
             return this;
         }
 

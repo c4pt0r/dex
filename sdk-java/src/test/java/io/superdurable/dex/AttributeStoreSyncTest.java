@@ -59,15 +59,14 @@ final class AttributeStoreSyncTest {
             assertFalse(absent.hasHistoryWindowEvents());
             assertFalse(absent.hasDeleteExpiredHistoryObjects());
             for (boolean shouldDelete : new boolean[] {true, false}) {
+                @SuppressWarnings("deprecation")
                 final FlowConfig config = FlowConfig.newBuilder()
                         .deleteExpiredHistoryObjects(shouldDelete).build();
                 final io.superdurable.gen.FlowConfig mapped = client.mapFlowConfig(config);
-                assertTrue(mapped.hasDeleteExpiredHistoryObjects());
-                assertEquals(shouldDelete, mapped.getDeleteExpiredHistoryObjects());
+                assertFalse(mapped.hasDeleteExpiredHistoryObjects());
                 final FlowStartOptions configuredStart = client.mapStartOptions(
                         StartFlowOptions.newBuilder().configOverride(config).build());
-                assertTrue(configuredStart.getFlowConfigOverride().hasDeleteExpiredHistoryObjects());
-                assertEquals(shouldDelete, configuredStart.getFlowConfigOverride().getDeleteExpiredHistoryObjects());
+                assertFalse(configuredStart.getFlowConfigOverride().hasDeleteExpiredHistoryObjects());
             }
 
             final io.superdurable.gen.FlowConfig windowed = client.mapFlowConfig(

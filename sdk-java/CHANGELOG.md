@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Deprecated
+
+- Deprecated `FlowConfig.Builder.deleteExpiredHistoryObjects(boolean)`. It has no effect, and
+  the SDK no longer sends it.
+  server-zd 0.1.23 and later always delete the objects of expired history
+  segments, about one hour after the history window passes them, and accept
+  and ignore the field. Existing code that sets it still compiles.
+
 ### Breaking change
 
 This change ships in the next minor Java SDK release during Beta. Pull Workers

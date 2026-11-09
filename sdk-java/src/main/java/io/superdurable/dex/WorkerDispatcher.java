@@ -1004,9 +1004,6 @@ final class WorkerDispatcher {
             mapped.setAttributeStoreNames(io.superdurable.gen.AttributeStoreNames.newBuilder()
                     .addAllNames(config.getAttributeStoreNames()));
         }
-        if (config.getDeleteExpiredHistoryObjects() != null) {
-            mapped.setDeleteExpiredHistoryObjects(config.getDeleteExpiredHistoryObjects());
-        }
         if (config.getHistoryWindowEvents() != null) {
             mapped.setHistoryWindowEvents(config.getHistoryWindowEvents());
         }

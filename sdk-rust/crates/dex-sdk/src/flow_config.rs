@@ -24,7 +24,6 @@ pub struct FlowConfig {
     pub(crate) continue_as_new_page_size_bytes: Option<u32>,
     pub(crate) step_durability: Option<StepDurability>,
     pub(crate) history_window_events: Option<u32>,
-    pub(crate) delete_expired_history_objects: Option<bool>,
 }
 
 impl FlowConfig {
@@ -69,36 +68,21 @@ impl FlowConfig {
         self
     }
 
-    /// Controls deletion of object storage objects for expired history segments.
+    /// Has no effect. The SDK does not send this value to the server.
     ///
-    /// `true` deletes each expired segment's object about one hour after expiry. `false` keeps
-    /// objects until the run is deleted after retention. This only matters when history
-    /// offload is enabled. Omission uses `history.deleteExpiredObjects` on the server: true
-    /// for dev/local and false for serve. The run records that default at start.
-    /// The server-side switch is experimental.
-    /// Servers older than server-zd 0.1.22 ignore the value.
-    ///
-    /// Set it through [`crate::StartFlowOptions::config_override`],
-    /// update it with [`crate::Client::update_flow_config`], or override it with
-    /// [`crate::SubFlowOptions::config_override`]. Children otherwise inherit the parent's value.
-    /// An omitted update preserves the current value; it cannot be cleared to the server
-    /// default. Enabling deletion includes already expired objects. Disabling it stops
-    /// deletions that have not started; requests already sent may complete, and deleted
-    /// objects never return. History reads and Time Travel exclude expired history even
-    /// when its objects are kept.
-    ///
-    /// ```no_run
-    /// # fn update(client: &dex_sdk::Client) -> dex_sdk::SdkResult<()> {
-    /// client.update_flow_config("order-42",
-    ///     dex_sdk::FlowConfig::new().delete_expired_history_objects(false))?;
-    /// # Ok(())
-    /// # }
-    /// ```
+    /// server-zd 0.1.23 and later always delete the objects of expired history segments, about
+    /// one hour after the history window passes them. They accept and ignore this field. The
+    /// method remains so existing code still compiles. Returns this config unchanged.
     ///
     /// Since 1.39.0.
+    ///
+    /// Deprecated in 1.40.0: the server always deletes expired history objects. Remove the call.
+    #[deprecated(
+        since = "1.40.0",
+        note = "has no effect; server-zd 0.1.23 and later always delete expired history objects"
+    )]
     #[must_use]
-    pub fn delete_expired_history_objects(mut self, value: bool) -> Self {
-        self.delete_expired_history_objects = Some(value);
+    pub fn delete_expired_history_objects(self, _value: bool) -> Self {
         self
     }
 

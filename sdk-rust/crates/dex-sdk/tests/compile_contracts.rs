@@ -195,6 +195,7 @@ fn credential_options_compile() {
 }
 
 #[test]
+#[expect(deprecated, reason = "the deprecated builder must keep compiling")]
 fn delete_expired_history_objects_builder_compiles() {
     let _start_options = dex_sdk::StartFlowOptions::new()
         .config_override(dex_sdk::FlowConfig::new().delete_expired_history_objects(true));

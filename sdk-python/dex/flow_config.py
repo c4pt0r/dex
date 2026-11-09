@@ -86,29 +86,19 @@ class FlowConfig:
                 ... )
 
             .. versionadded:: 1.38.0
-        delete_expired_history_objects: Controls deletion of object storage objects for expired history segments.
+        delete_expired_history_objects: Has no effect. The SDK does not send it
+            to the server.
 
-            True deletes each expired segment's object about one hour after expiry. False keeps
-            objects until the run is deleted after retention. This only matters when history
-            offload is enabled. ``None``, the default, uses ``history.deleteExpiredObjects`` on the server: true
-            for dev/local and false for serve. The run records that default at start.
-            The server-side switch is experimental.
-            Servers older than server-zd 0.1.22 ignore the value.
-
-            Set it through ``StartFlowOptions.config_override``, update it with ``update_flow_config``,
-            or override it with ``SubFlowOptions.config_override``. Children otherwise inherit the parent's value.
-            An omitted update preserves the current value; it cannot be cleared to the server
-            default. Enabling deletion includes already expired objects. Disabling it stops
-            deletions that have not started; requests already sent may complete, and deleted
-            objects never return. History reads and Time Travel exclude expired history even
-            when its objects are kept.
-
-            Example:
-                >>> client.update_flow_config(
-                ...     "order-42", FlowConfig(delete_expired_history_objects=False)
-                ... )
+            server-zd 0.1.23 and later always delete the objects of expired
+            history segments, about one hour after the history window passes
+            them. They accept and ignore this field. The field remains so
+            existing code keeps working.
 
             .. versionadded:: 1.39.0
+
+            .. deprecated:: 1.40.0
+               The server always deletes expired history objects. Remove this
+               field from your code.
     """
 
     active_step_search_mode: ActiveStepSearchMode | None = None

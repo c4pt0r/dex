@@ -2686,6 +2686,7 @@ type FlowConfig struct {
 	ContinueAsNewPageSizeBytes  *int32
 	StepDurability              *StepDurability
 	HistoryWindowEvents         *int32
+	// Deprecated: no effect and not sent; the server always deletes expired history objects.
 	DeleteExpiredHistoryObjects *bool
 }
 

@@ -500,7 +500,6 @@ func mapFlowConfig(config *FlowConfig) (*dexpb.FlowConfig, error) {
 		StepDurability:               durability,
 		AttributeStoreNames:          attributeStoreNames,
 		HistoryWindowEvents:          config.HistoryWindowEvents,
-		DeleteExpiredHistoryObjects:  config.DeleteExpiredHistoryObjects,
 	}, nil
 }
 

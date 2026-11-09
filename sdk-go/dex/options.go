@@ -296,30 +296,16 @@ type FlowConfig struct {
 	// Since 1.38.0.
 	HistoryWindowEvents *int32
 
-	// DeleteExpiredHistoryObjects controls deletion of object storage objects for expired history segments.
+	// DeleteExpiredHistoryObjects has no effect. The SDK does not send it to the server.
 	//
-	// A true value deletes each expired segment's object about one hour after expiry. A false value keeps
-	// objects until the run is deleted after retention. This only matters when history
-	// offload is enabled. Nil uses history.deleteExpiredObjects on the server: true
-	// for dev/local and false for serve. The run records that default at start.
-	// The server-side switch is experimental.
-	// Servers older than server-zd 0.1.22 ignore the value.
-	//
-	// Set it through StartFlowOptions.ConfigOverride, update it with Client.UpdateFlowConfig,
-	// or override it with SubFlowOptions.ConfigOverride. Children otherwise inherit the parent's value.
-	// An omitted update preserves the current value; it cannot be cleared to the server
-	// default. Enabling deletion includes already expired objects. Disabling it stops
-	// deletions that have not started; requests already sent may complete, and deleted
-	// objects never return. History reads and Time Travel exclude expired history even
-	// when its objects are kept.
-	//
-	// Example:
-	//
-	//	err := client.UpdateFlowConfig(ctx, "order-42", dex.FlowConfig{
-	//	    DeleteExpiredHistoryObjects: ptr.Any(false),
-	//	})
+	// server-zd 0.1.23 and later always delete the objects of expired history segments,
+	// about one hour after the history window passes them. They accept and ignore this field.
+	// The field remains so existing code still compiles.
 	//
 	// Since 1.39.0.
+	//
+	// Deprecated: this field has no effect because the server always deletes expired history
+	// objects. Remove it from your code. Deprecated in 1.40.0.
 	DeleteExpiredHistoryObjects *bool
 }
 

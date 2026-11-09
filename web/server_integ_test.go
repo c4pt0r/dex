@@ -213,7 +213,6 @@ func TestWebServerUpdatesOnlyEditedHistoryConfigFields(t *testing.T) {
 		name                string
 		body                string
 		historyWindowEvents *int32
-		deleteExpired       *bool
 	}{
 		{
 			name:                "window only",
@@ -221,15 +220,9 @@ func TestWebServerUpdatesOnlyEditedHistoryConfigFields(t *testing.T) {
 			historyWindowEvents: ptr.Any(int32(500)),
 		},
 		{
-			name:          "delete only",
-			body:          `{"flowId":"checkout-1","runId":"run-1","deleteExpiredHistoryObjects":false}`,
-			deleteExpired: ptr.Any(false),
-		},
-		{
-			name:                "both fields",
+			name:                "window with ignored delete flag",
 			body:                `{"flowId":"checkout-1","runId":"run-1","historyWindowEvents":20,"deleteExpiredHistoryObjects":true}`,
 			historyWindowEvents: ptr.Any(int32(20)),
-			deleteExpired:       ptr.Any(true),
 		},
 	} {
 		t.Run(scenario.name, func(t *testing.T) {
@@ -244,10 +237,7 @@ func TestWebServerUpdatesOnlyEditedHistoryConfigFields(t *testing.T) {
 				t.Fatalf("unexpected run target: %+v", update)
 			}
 			// UpdateFlowConfig merges set fields, so every other field must stay unset.
-			expected := &dexpb.FlowConfig{
-				HistoryWindowEvents:         scenario.historyWindowEvents,
-				DeleteExpiredHistoryObjects: scenario.deleteExpired,
-			}
+			expected := &dexpb.FlowConfig{HistoryWindowEvents: scenario.historyWindowEvents}
 			if !proto.Equal(update.GetFlowConfig(), expected) {
 				t.Fatalf("flow config = %v, want only %v", update.GetFlowConfig(), expected)
 			}
@@ -262,7 +252,8 @@ func TestWebServerUpdatesOnlyEditedHistoryConfigFields(t *testing.T) {
 		`{"flowId":"checkout-1","runId":"run-1","historyWindowEvents":-5}`,
 		`{"flowId":"checkout-1","runId":"run-1","historyWindowEvents":2147483648}`,
 		`{"flowId":"checkout-1","runId":"run-1","historyWindowEvents":1.5}`,
-		`{"flowId":"checkout-1","runId":"run-1","deleteExpiredHistoryObjects":"yes"}`,
+		`{"flowId":"checkout-1","runId":"run-1","deleteExpiredHistoryObjects":false}`,
+		`{"flowId":"checkout-1","runId":"run-1","historyWindowEvents":5,"deleteExpiredHistoryObjects":"yes"}`,
 		`{"flowId":"checkout-1","runId":"run-1","historyWindowEvents":5,"workerTarget":{}}`,
 	} {
 		response := sendJSON(t, http.MethodPut, harness.http.URL+"/api/flows/config/history", invalidBody)
@@ -274,6 +265,18 @@ func TestWebServerUpdatesOnlyEditedHistoryConfigFields(t *testing.T) {
 	}
 	if len(service.configRequests) != 0 {
 		t.Fatal("rejected history config update reached FlowService")
+	}
+
+	deleteOnly := sendJSON(
+		t,
+		http.MethodPut,
+		harness.http.URL+"/api/flows/config/history",
+		`{"flowId":"checkout-1","runId":"run-1","deleteExpiredHistoryObjects":false}`,
+	)
+	deleteOnlyBody := readBody(t, deleteOnly)
+	deleteOnly.Body.Close()
+	if !strings.Contains(deleteOnlyBody, "deleteExpiredHistoryObjects is ignored") {
+		t.Fatalf("delete-only body = %q, want the ignored-field explanation", deleteOnlyBody)
 	}
 
 	rejected := sendJSON(
